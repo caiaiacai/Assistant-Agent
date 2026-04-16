@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 500" width="700" height="500" font-family="'PingFang SC','Helvetica Neue',Arial,sans-serif">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <filter id="glow2">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#4f8ef7" opacity="0.8"/>
+    </marker>
+  </defs>
+
+  <rect width="700" height="500" fill="url(#bg2)" rx="16"/>
+
+  <!-- Title -->
+  <text x="350" y="38" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">Assistant-Agent · 飞轮闭环</text>
+  <text x="350" y="58" text-anchor="middle" font-size="12" fill="#666">系统适应你，而不是你去适应工具</text>
+
+  <!-- Center circle -->
+  <circle cx="350" cy="265" r="62" fill="#12121f" stroke="#7b5ea7" stroke-width="2" filter="url(#glow2)"/>
+  <text x="350" y="258" text-anchor="middle" font-size="13" fill="#a78bfa" font-weight="700">用户模型</text>
+  <text x="350" y="276" text-anchor="middle" font-size="10" fill="#666">越用越懂你</text>
+
+  <!-- Node 1: 输入 (top) -->
+  <circle cx="350" cy="108" r="46" fill="#1a1f2e" stroke="#4f8ef7" stroke-width="2"/>
+  <text x="350" y="103" text-anchor="middle" font-size="13" fill="#4f8ef7" font-weight="700">输入</text>
+  <text x="350" y="119" text-anchor="middle" font-size="10" fill="#888">微信 / 桌面</text>
+
+  <!-- Node 2: 意图识别 (top-right) -->
+  <circle cx="540" cy="178" r="46" fill="#1f2d1f" stroke="#22c55e" stroke-width="2" filter="url(#glow2)"/>
+  <text x="540" y="173" text-anchor="middle" font-size="13" fill="#22c55e" font-weight="700">意图识别</text>
+  <text x="540" y="189" text-anchor="middle" font-size="10" fill="#888">L3 · LLM</text>
+
+  <!-- Node 3: 执行 (bottom-right) -->
+  <circle cx="540" cy="352" r="46" fill="#1a1f2e" stroke="#4f8ef7" stroke-width="2"/>
+  <text x="540" y="347" text-anchor="middle" font-size="13" fill="#4f8ef7" font-weight="700">执行</text>
+  <text x="540" y="363" text-anchor="middle" font-size="10" fill="#888">L6·L7 编排+工具</text>
+
+  <!-- Node 4: 反馈 (bottom) -->
+  <circle cx="350" cy="422" r="46" fill="#1a1a14" stroke="#f59e0b" stroke-width="2"/>
+  <text x="350" y="417" text-anchor="middle" font-size="13" fill="#f59e0b" font-weight="700">反馈</text>
+  <text x="350" y="433" text-anchor="middle" font-size="10" fill="#888">L8 · 8状态矩阵</text>
+
+  <!-- Node 5: 蒸馏 (bottom-left) -->
+  <circle cx="160" cy="352" r="46" fill="#1f2d1f" stroke="#22c55e" stroke-width="2" filter="url(#glow2)"/>
+  <text x="160" y="347" text-anchor="middle" font-size="13" fill="#22c55e" font-weight="700">蒸馏</text>
+  <text x="160" y="363" text-anchor="middle" font-size="10" fill="#888">L9 · LLM</text>
+
+  <!-- Node 6: 技能库 (top-left) -->
+  <circle cx="160" cy="178" r="46" fill="#1a1f2e" stroke="#4f8ef7" stroke-width="2"/>
+  <text x="160" y="173" text-anchor="middle" font-size="13" fill="#4f8ef7" font-weight="700">技能库</text>
+  <text x="160" y="189" text-anchor="middle" font-size="10" fill="#888">L5 · 模板复用</text>
+
+  <!-- Arrows (clockwise) -->
+  <!-- 输入 → 意图识别 -->
+  <path d="M 392 128 C 440 130 490 148 498 155" stroke="#4f8ef7" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <text x="447" y="128" font-size="10" fill="#4f8ef7">解析</text>
+
+  <!-- 意图识别 → 执行 -->
+  <path d="M 552 224 C 556 268 552 294 549 308" stroke="#22c55e" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <text x="564" y="270" font-size="10" fill="#22c55e">触发</text>
+
+  <!-- 执行 → 反馈 -->
+  <path d="M 498 392 C 450 408 406 414 396 418" stroke="#4f8ef7" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <text x="445" y="420" font-size="10" fill="#4f8ef7">推送</text>
+
+  <!-- 反馈 → 蒸馏 -->
+  <path d="M 304 418 C 254 414 210 400 207 396" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <text x="240" y="426" font-size="10" fill="#f59e0b">学习</text>
+
+  <!-- 蒸馏 → 技能库 -->
+  <path d="M 148 306 C 144 268 148 224 150 222" stroke="#22c55e" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <text x="118" y="270" font-size="10" fill="#22c55e">固化</text>
+
+  <!-- 技能库 → 输入 -->
+  <path d="M 202 155 C 252 140 300 126 304 122" stroke="#4f8ef7" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <text x="238" y="130" font-size="10" fill="#4f8ef7">优化</text>
+
+  <!-- Center connections (user model ↔ nodes) -->
+  <line x1="350" y1="203" x2="350" y2="203" stroke="none"/>
+  <!-- Model → 意图层 -->
+  <path d="M 400 240 C 450 220 490 200 496 196" stroke="#7b5ea7" stroke-width="1.5" stroke-dasharray="4,3" fill="none"/>
+  <text x="448" y="216" font-size="9" fill="#7b5ea7">注入偏好</text>
+  <!-- Model → 技能库 -->
+  <path d="M 300 240 C 250 220 210 200 204 196" stroke="#7b5ea7" stroke-width="1.5" stroke-dasharray="4,3" fill="none"/>
+  <text x="220" y="212" font-size="9" fill="#7b5ea7">个性化</text>
+  <!-- Distill → Model -->
+  <path d="M 200 330 C 260 310 300 295 290 278" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arr)"/>
+
+  <!-- Iteration note -->
+  <text x="350" y="476" text-anchor="middle" font-size="11" fill="#555">第 1 天 · 准确率 ~65%　　第 7 天 · ~80%　　第 30 天 · ~93%</text>
+</svg>
