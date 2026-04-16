@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assistant-Agent · 效果演示</title>
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --card: #1a1a2e;
+    --card2: #1e2235;
+    --border: #2a2a40;
+    --orange: #ff6b35;
+    --orange-light: #ff9f1c;
+    --blue: #4f8ef7;
+    --green: #22c55e;
+    --purple: #a78bfa;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --text: #e8e8f0;
+    --mid: #8899aa;
+    --dim: #444455;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'PingFang SC','Helvetica Neue',Arial,sans-serif; line-height: 1.6; }
+
+  .hero { text-align: center; padding: 64px 24px 48px; }
+  .hero h1 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+  .hero p { color: var(--mid); font-size: 15px; max-width: 520px; margin: 0 auto; }
+  .badge { display: inline-block; background: #1a2a1a; color: var(--green); border: 1px solid #2a3a2a; border-radius: 20px; padding: 3px 12px; font-size: 12px; margin-bottom: 20px; }
+
+  /* Key Metrics */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; max-width: 900px; margin: 0 auto 60px; padding: 0 24px; }
+  .metric { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
+  .metric-label { font-size: 11px; color: var(--mid); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px; }
+  .metric-val { font-size: 22px; font-weight: 700; color: var(--green); }
+  .metric-sub { font-size: 11px; color: var(--mid); margin-top: 4px; }
+  .arrow { color: var(--orange); margin: 0 4px; }
+
+  /* Section */
+  .section { max-width: 1100px; margin: 0 auto 60px; padding: 0 24px; }
+  .section-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+  .section-sub { color: var(--mid); font-size: 13px; margin-bottom: 28px; }
+
+  /* Compare header */
+  .compare-header { display: grid; grid-template-columns: 220px 1fr 1fr; gap: 16px; margin-bottom: 12px; }
+  .col-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; padding: 10px 16px; border-radius: 8px; text-align: center; }
+  .col-cold { background: #1a1520; color: #888; border: 1px solid #2a2030; }
+  .col-mature { background: #0d1f0d; color: var(--green); border: 1px solid #1a3a1a; }
+
+  /* BUF card */
+  .buf-row { display: grid; grid-template-columns: 220px 1fr 1fr; gap: 16px; margin-bottom: 16px; align-items: start; }
+  .buf-meta { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .buf-id { font-size: 11px; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
+  .buf-type { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px; margin-bottom: 8px; font-weight: 600; }
+  .type-work { background: #1a2535; color: var(--blue); }
+  .type-life { background: #1a2520; color: var(--green); }
+  .type-think { background: #251a35; color: var(--purple); }
+  .type-monitor { background: #2a2010; color: var(--yellow); }
+  .buf-input { font-size: 12px; color: var(--text); line-height: 1.5; margin-bottom: 8px; }
+  .buf-conf { font-size: 11px; color: var(--mid); }
+  .buf-conf span { color: var(--orange-light); font-weight: 600; }
+
+  .buf-cell { border-radius: 10px; padding: 14px; font-size: 12px; line-height: 1.6; }
+  .buf-cell-cold { background: #16121e; border: 1px solid #251a30; }
+  .buf-cell-mature { background: #0d1a0d; border: 1px solid #1a3020; }
+
+  .decision { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 8px; font-weight: 700; margin-bottom: 8px; }
+  .decision-guess { background: #2a1a10; color: var(--orange); }
+  .decision-direct { background: #0d2a0d; color: var(--green); }
+  .decision-skip { background: #1a1a1a; color: #666; }
+
+  .output-text { color: var(--text); margin-bottom: 8px; }
+  .miss { color: var(--red); font-size: 11px; margin-top: 6px; }
+  .miss::before { content: "✗ "; }
+  .hit { color: var(--green); font-size: 11px; margin-top: 6px; }
+  .hit::before { content: "✓ "; }
+  .action-item { background: #0d1520; border-left: 2px solid var(--blue); padding: 4px 8px; margin: 4px 0; border-radius: 0 4px 4px 0; font-size: 11px; }
+  .action-item-g { background: #0d1a0d; border-left: 2px solid var(--green); padding: 4px 8px; margin: 4px 0; border-radius: 0 4px 4px 0; font-size: 11px; }
+  .conf-badge { font-size: 10px; color: var(--mid); }
+  .conf-badge span { color: var(--orange-light); }
+
+  /* Summary box */
+  .summary-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-top: 40px; }
+  .summary-title { font-size: 14px; font-weight: 700; color: var(--purple); margin-bottom: 16px; }
+  .summary-row { display: grid; grid-template-columns: 160px 1fr 1fr; gap: 12px; margin-bottom: 10px; font-size: 12px; align-items: start; }
+  .summary-key { color: var(--mid); }
+  .summary-cold { color: #666; }
+  .summary-mature { color: var(--green); }
+
+  .note { background: #12120f; border: 1px solid #2a2a10; border-radius: 8px; padding: 12px 16px; font-size: 11px; color: #888; margin-top: 8px; }
+  .note strong { color: var(--yellow); }
+
+  @media (max-width: 768px) {
+    .metrics { grid-template-columns: repeat(2,1fr); }
+    .compare-header, .buf-row { grid-template-columns: 1fr; }
+    .compare-header .col-label:first-child { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">模拟验证数据 · 仅供参考</div>
+  <h1>Assistant-Agent · 效果演示</h1>
+  <p>以下对比基于多轮模拟推演，展示系统从冷启动到成熟期的行为变化。同样的输入，系统理解深度随用户画像积累持续提升。</p>
+</div>
+
+<!-- Metrics -->
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-label">平均置信度</div>
+    <div class="metric-val">0.73 <span class="arrow">→</span> 0.90</div>
+    <div class="metric-sub">↑ +23%</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">直接执行比例</div>
+    <div class="metric-val">20% <span class="arrow">→</span> 100%</div>
+    <div class="metric-sub">↑ +80pp</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">推送条数</div>
+    <div class="metric-val">3 <span class="arrow">→</span> 6</div>
+    <div class="metric-sub">更多但更精准</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">用户输入字数</div>
+    <div class="metric-val">124 <span class="arrow">→</span> 31</div>
+    <div class="metric-sub">↓ 75%，做的更多</div>
+  </div>
+</div>
+
+<!-- Comparison -->
+<div class="section">
+  <div class="section-title">五组输入 · 全流程对比</div>
+  <div class="section-sub">同一组用户输入，在冷启动期（第1天）与成熟期（第45天）的系统响应对比</div>
+
+  <div class="compare-header">
+    <div></div>
+    <div class="col-label col-cold">冷启动期 · 第 1 天</div>
+    <div class="col-label col-mature">成熟期 · 第 45 天</div>
+  </div>
+
+  <!-- BUF-A -->
+  <div class="buf-row">
+    <div class="buf-meta">
+      <div class="buf-id">BUF-A</div>
+      <div class="buf-type type-work">工作</div>
+      <div class="buf-input">「明天09:30提醒10:00见陈总，准备BP，联系王律师」</div>
+      <div class="buf-conf">输入 <span>3句话</span></div>
+    </div>
+    <div class="buf-cell buf-cell-cold">
+      <div class="decision decision-guess">猜测执行</div>
+      <div class="output-text">
+        <div class="action-item">明天09:30：提醒10:00见陈总，准备BP，联系王律师</div>
+      </div>
+      <div class="miss">陈总是谁？BP哪级？地点在哪？全不知道</div>
+    </div>
+    <div class="buf-cell buf-cell-mature">
+      <div class="decision decision-direct">直接执行</div>
+      <div class="output-text">
+        <div class="action-item-g">今晚21:00：明天见陈总，BP数据页记得今晚更新</div>
+        <div class="action-item-g">明早09:30：30分钟后见陈总，带BP v2.3，上次他关注增长数据</div>
+        <div class="action-item-g">待办：联系王律师（融资合同跟进）</div>
+      </div>
+      <div class="hit">知道陈总=A轮投资人 / BP当前V2.3 / 王律师=融资合同 / 上次谈话重点</div>
+    </div>
+  </div>
+
+  <!-- BUF-B -->
+  <div class="buf-row">
+    <div class="buf-meta">
+      <div class="buf-id">BUF-B</div>
+      <div class="buf-type type-monitor">竞品监控</div>
+      <div class="buf-input">「[图片OCR] 竞品A新功能 AI推荐算法 上线日期11/15」</div>
+      <div class="buf-conf">置信度 <span>0.72 → 0.90</span></div>
+    </div>
+    <div class="buf-cell buf-cell-cold">
+      <div class="decision decision-direct">直接监控</div>
+      <div class="output-text">
+        <div class="action-item">竞品库写入：竞品A / AI功能 / 11月上线</div>
+      </div>
+      <div class="miss">竞品A是谁？对业务影响？无法判断</div>
+    </div>
+    <div class="buf-cell buf-cell-mature">
+      <div class="decision decision-direct">直接执行</div>
+      <div class="output-text">
+        <div class="action-item-g">立即：竞品A AI推荐算法11/15上线（45天后）</div>
+        <div class="action-item-g">历史：今年已上线3个功能，节奏加快</div>
+        <div class="action-item-g">建议：本周评估对我们路线图的影响</div>
+      </div>
+      <div class="hit">知道竞品A动态 + 我方产品路线图，给出影响评估</div>
+    </div>
+  </div>
+
+  <!-- BUF-C -->
+  <div class="buf-row">
+    <div class="buf-meta">
+      <div class="buf-id">BUF-C</div>
+      <div class="buf-type type-work">工作</div>
+      <div class="buf-input">「验收接口，完成后更新老板」</div>
+      <div class="buf-conf">输入 <span>2句话 → 1句话</span></div>
+    </div>
+    <div class="buf-cell buf-cell-cold">
+      <div class="decision decision-guess">猜测执行</div>
+      <div class="output-text">
+        <div class="action-item">立即：待办@验收接口完成更新老板</div>
+      </div>
+      <div class="miss">哪个项目？老板是谁？怎么同步？</div>
+    </div>
+    <div class="buf-cell buf-cell-mature">
+      <div class="decision decision-direct">直接执行</div>
+      <div class="output-text">
+        <div class="action-item-g">验收 Checklist：接口延迟&lt;200ms ✓ 并发压测 ✓ 边界case ✓</div>
+        <div class="action-item-g">完成后一键发给张总</div>
+      </div>
+      <div class="hit">知道哪个项目 / 老板=张总 / 验收标准与目标值</div>
+    </div>
+  </div>
+
+  <!-- BUF-D -->
+  <div class="buf-row">
+    <div class="buf-meta">
+      <div class="buf-id">BUF-D</div>
+      <div class="buf-type type-life">生活</div>
+      <div class="buf-input">「[语音] 猫粮快没了，明天要买」</div>
+      <div class="buf-conf">置信度 <span>0.82 → 0.88</span></div>
+    </div>
+    <div class="buf-cell buf-cell-cold">
+      <div class="decision decision-guess">猜测待办</div>
+      <div class="output-text">
+        <div class="action-item">次日10:00：记得买猫粮（待办）</div>
+      </div>
+      <div class="miss">什么品牌？在哪买？数量？全不知道</div>
+    </div>
+    <div class="buf-cell buf-cell-mature">
+      <div class="decision decision-direct">直接执行</div>
+      <div class="output-text">
+        <div class="action-item-g">Royal Canin 成猫粮 4kg，京东 ¥168</div>
+        <div class="action-item-g">待办：Royal Canin 京东下单</div>
+      </div>
+      <div class="hit">知道品牌 / 渠道 / 规格 / 价格 / 上次购买时间</div>
+    </div>
+  </div>
+
+  <!-- BUF-E -->
+  <div class="buf-row">
+    <div class="buf-meta">
+      <div class="buf-id">BUF-E</div>
+      <div class="buf-type type-think">战略思考</div>
+      <div class="buf-input">（碎片想法，关于B2B获客策略）</div>
+      <div class="buf-conf">输入 <span>42字 → 9字</span></div>
+    </div>
+    <div class="buf-cell buf-cell-cold">
+      <div class="decision decision-skip">不推送</div>
+      <div class="output-text" style="color:var(--dim);">存档查存</div>
+      <div class="miss">公司B2B还是B2C？这是第几次提？优先级？全不知道</div>
+    </div>
+    <div class="buf-cell buf-cell-mature">
+      <div class="decision decision-direct">直接执行</div>
+      <div class="output-text">
+        <div class="action-item-g">明早（睡前不打扰）：你已第3次提到B2B获客策略</div>
+        <div class="action-item-g">本周前已讨论一次，帮你整理前3次想法</div>
+        <div class="action-item-g">另：明天陈总可能会问增长策略，可作为素材</div>
+      </div>
+      <div class="hit">识别重复信号 + 关联明天高密会议 + 主动建议推进时机</div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-box">
+    <div class="summary-title">BUF-E 详细对比：同一条战略思考输入</div>
+    <div class="summary-row">
+      <div class="summary-key">输入字数</div>
+      <div class="summary-cold">42 字</div>
+      <div class="summary-mature">9 字</div>
+    </div>
+    <div class="summary-row">
+      <div class="summary-key">系统理解</div>
+      <div class="summary-cold">用户公司是B2B？这是第一次提？优先级高还是低？全不知道</div>
+      <div class="summary-mature">B2B公司确认 / 本月第3次提 / A轮融资中获客是核心KPI / 明天陈总会问</div>
+    </div>
+    <div class="summary-row">
+      <div class="summary-key">推送内容</div>
+      <div class="summary-cold">不推送，存档</div>
+      <div class="summary-mature">「你已第3次提到这件事，建议本周推进，明天陈总也会问」</div>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:24px;">
+    <strong>注：</strong>以上数据基于模拟用户「张晨」30天行为推演生成，用于展示系统学习机制的设计意图。实际使用效果因用户习惯、输入频率、反馈质量而异。冷启动期通常需要 7–14 天积累足够的行为样本。
+  </div>
+</div>
+
+</body>
+</html>
