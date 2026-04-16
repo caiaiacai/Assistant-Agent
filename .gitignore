@@ -1,0 +1,51 @@
+# ── 数据库（用户私有数据，绝对不提交）──
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.db-backup*
+*.db.backup*
+
+# ── macOS 应用包（编译产物）──
+SATH.app/
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# ── Rust / Cargo ──
+sath-server/target/
+
+# ── 系统文件 ──
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ── 环境变量 / 密钥 ──
+.env
+.env.*
+*.key
+*.pem
+secrets.json
+
+# ── 日志 ──
+*.log
+logs/
+
+# ── 编辑器 ──
+.vscode/
+.idea/
+*.sublime-*
+
+# ── 模拟数据（仅供本地测试）──
+sath_simulation_30days.db
+simulate_30days.py

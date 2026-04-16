@@ -1,0 +1,195 @@
+.rc {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: start;
+  gap: 0 6px;
+  padding: 8px 8px 8px 6px;
+  background: var(--cream-dim);
+  border: 1px solid var(--gray);
+  border-bottom: none;
+  transition: background 0.1s;
+}
+
+/* Stack items like a list — only last gets bottom border */
+.rc:first-child { border-radius: 3px 3px 0 0; }
+.rc:last-child  { border-bottom: 1px solid var(--gray); border-radius: 0 0 3px 3px; }
+.rc:only-child  { border-radius: 3px; border-bottom: 1px solid var(--gray); }
+
+.rc:hover { background: var(--cream-inset); }
+
+.rc--done .rc__title { text-decoration: line-through; opacity: 0.38; }
+
+/* pending state */
+.rc--pending { opacity: 0.65; cursor: default; }
+.rc--pending .rc__body { cursor: default; }
+.rc--pending .rc__title { color: var(--text-muted); }
+.rc--pending .rc__type  { color: var(--accent); }
+
+.rc__pending-dots {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+.rc__pending-dots span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: dot-pulse 1.2s ease-in-out infinite;
+}
+.rc__pending-dots span:nth-child(2) { animation-delay: 0.2s; }
+.rc__pending-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dot-pulse {
+  0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+  40%            { opacity: 1;   transform: scale(1); }
+}
+
+/* ── Checkbox ── */
+.rc__check {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1.5px solid var(--gray);
+  background: var(--cream);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: background 0.1s, border-color 0.1s;
+  padding: 0;
+}
+.rc__check:hover { border-color: var(--dark-mid); }
+.rc__check::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: var(--dark);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+.rc__check--on               { border-color: var(--dark); }
+.rc__check--on::after        { opacity: 1; }
+
+/* ── Body ── */
+.rc__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  user-select: none;
+}
+
+.rc__head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rc__type {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+
+.rc__title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--dark);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rc__meta { display: flex; align-items: center; gap: 6px; }
+
+.rc__time {
+  font-size: 10px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Agent 状态点 */
+.rc__agent-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: 700; line-height: 1;
+}
+.rc__agent-dot--running {
+  background: var(--accent);
+  animation: dot-pulse 1s ease-in-out infinite;
+}
+.rc__agent-dot--failed {
+  background: #c0392b; color: #fff; width: 11px; height: 11px;
+  border-radius: 50%; font-size: 8px;
+}
+
+/* 实时进度 */
+.rc__progress {
+  font-size: 10px;
+  color: var(--text-faint);
+  margin-top: 3px;
+  font-family: 'SF Mono', 'Menlo', monospace;
+  letter-spacing: 0.2px;
+}
+
+
+.rc__detail {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--gray);
+  white-space: pre-wrap;
+  word-break: break-word;
+  user-select: text;
+}
+
+.rc__json {
+  font-size: 10px;
+  color: var(--text-faint);
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: 'SF Mono', 'Menlo', monospace;
+}
+
+/* ── Right controls ── */
+.rc__controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: 2px;
+}
+
+.rc__chevron {
+  font-size: 13px;
+  color: var(--text-faint);
+  transition: transform 0.18s;
+  line-height: 1;
+  user-select: none;
+}
+.rc__chevron--open { transform: rotate(90deg); }
+
+.rc__del {
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: none;
+  color: transparent;
+  font-size: 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  transition: background 0.1s, color 0.1s;
+  padding: 0;
+}
+.rc:hover .rc__del { color: var(--text-faint); }
+.rc__del:hover     { background: var(--cream-inset); color: var(--dark) !important; }

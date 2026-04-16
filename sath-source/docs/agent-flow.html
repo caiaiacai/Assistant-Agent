@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<title>SATH Agent 框架流程图</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", sans-serif;
+    background: #f7f8fa;
+    padding: 24px 16px;
+    color: #1a1a2e;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 4px; }
+  .subtitle { text-align: center; font-size: 12px; color: #888; margin-bottom: 24px; }
+  .section { margin-bottom: 32px; }
+  .section h2 {
+    font-size: 15px; font-weight: 700; margin-bottom: 10px;
+    padding-left: 10px; border-left: 3px solid #4a7c59;
+  }
+  .mermaid {
+    background: #fff; border-radius: 10px; padding: 16px 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+</style>
+</head>
+<body>
+
+<h1>SATH Agent 内部框架</h1>
+<p class="subtitle">感知型智能待办中枢 — 从念头到产出的完整链路</p>
+
+<div class="section">
+  <h2>1. 端到端总览</h2>
+  <pre class="mermaid">
+flowchart TB
+  U["用户/飞书/微信 输入念头"] --> DB[(SQLite)]
+
+  CTX["Context 采样器\n每3s osascript\n→ 30min 环形缓冲\n→ summarize_recent()"] --> PLAN
+
+  PER["Persona 画像\nrole / focus / prefs\n+ location_hint()"] --> PLAN
+
+  DB --> PLAN["Planner\n① 类目预选 (库>12)\n② Pipeline 生成\n③ due_at 本地覆盖"]
+
+  LIB["Agent 库\n~/sath/agents/\ncategory/name/SOUL.md"] --> PLAN
+  LIB --> EXEC
+
+  PLAN -->|"Plan JSON\ntypes/tags/pipeline"| DB
+  PLAN -->|"pipeline 非空"| EXEC["Executor\nDAG 并行调度\n→ ReAct 循环"]
+
+  EXEC --> TOOLS["工具层\nweb_search · web_fetch\nfs_* · shell_run\n(沙箱隔离)"]
+  TOOLS --> EXEC
+
+  EXEC -->|"agent_output"| DB
+  EXEC --> EVT["Tauri 事件\npipeline-progress"]
+  EXEC --> SYNC["Obsidian/飞书/微信\n同步回复"]
+
+  DB --> UI["前端 TODO 卡片渲染"]
+
+  style CTX fill:#e3f2fd,stroke:#1565c0
+  style PER fill:#fff3e0,stroke:#e65100
+  style PLAN fill:#f3e5f5,stroke:#7b1fa2
+  style EXEC fill:#fce4ec,stroke:#c62828
+  style TOOLS fill:#e0f2f1,stroke:#00695c
+  style LIB fill:#fff8e1,stroke:#f9a825
+  style UI fill:#e8f5e9,stroke:#558b2f
+  </pre>
+</div>
+
+<div class="section">
+  <h2>2. Planner 规划流程</h2>
+  <pre class="mermaid">
+flowchart LR
+  IN["原始输入\n+ Context\n+ Persona"] --> CHK{"库 > 12?"}
+  CHK -->|是| ST1["Stage-1\nLLM 挑 ≤3 类目"]
+  CHK -->|否| ST2
+  ST1 --> ST2["Stage-2\nLLM → Pipeline JSON"]
+  ST2 --> VAL["校验 agent\n剔除不存在的"]
+  VAL --> DUE["本地 due_at\n覆盖 LLM 输出"]
+  DUE --> CONF{"confidence\n< 0.75?"}
+  CONF -->|是| REV["needs_review"]
+  CONF -->|否| SAVE
+  REV --> SAVE["写入 DB"]
+  SAVE --> PIPE{"pipeline\n非空?"}
+  PIPE -->|是| GO["spawn_pipeline()"]
+  PIPE -->|否| END["仅存储"]
+
+  style IN fill:#f3e5f5,stroke:#7b1fa2
+  style GO fill:#fce4ec,stroke:#c62828
+  style END fill:#e8f5e9,stroke:#4a7c59
+  </pre>
+</div>
+
+<div class="section">
+  <h2>3. Executor DAG 调度</h2>
+  <pre class="mermaid">
+flowchart TB
+  START["Pipeline 开始"] --> CYC{"依赖有环?"}
+  CYC -->|是| LIN["回退线性"]
+  CYC -->|否| LOOP
+  LIN --> LOOP["主循环"]
+  LOOP --> READY["找 ready steps\ndeps ⊆ completed"]
+  READY --> EMPTY{"空?"}
+  EMPTY -->|是| FIN
+  EMPTY -->|否| SPAWN["并行 spawn\n所有 ready"]
+  SPAWN --> WAIT["等待本批"]
+  WAIT --> OK["成功 → completed\n增量写 output"]
+  WAIT --> FAIL["失败 → 记录\n同批继续"]
+  OK --> DONE{"全完成?"}
+  DONE -->|否| LOOP
+  DONE -->|是| FIN
+  FAIL --> FIN["合并输出\n同步 Obsidian/飞书/微信\nemit pipeline_done"]
+
+  style START fill:#fce4ec,stroke:#c62828
+  style SPAWN fill:#e3f2fd,stroke:#1565c0
+  style FIN fill:#e8f5e9,stroke:#4a7c59
+  </pre>
+</div>
+
+<div class="section">
+  <h2>4. 单 Step ReAct 循环</h2>
+  <pre class="mermaid">
+flowchart TB
+  INIT["system: SOUL + 工具协议\nuser: persona + ctx + plan"] --> TURN["turn 1..max_turns"]
+  TURN --> CHK1{"todo 还在?"}
+  CHK1 -->|否| ABORT["中止"]
+  CHK1 -->|是| NUDGE{"剩余 ≤2?"}
+  NUDGE -->|是| WARN["追加 ⚠ final_answer"]
+  NUDGE -->|否| CMP
+  WARN --> CMP{"turn>4\nmsgs>8?"}
+  CMP -->|是| CMPR["LLM 压缩\n中间历史"]
+  CMP -->|否| CALL
+  CMPR --> CALL["chat() → JSON"]
+  CALL --> PARSE{"解析成功?"}
+  PARSE -->|失败| PROSE{"像 prose?"}
+  PROSE -->|是| IMPL["隐式 final_answer"]
+  PROSE -->|否| RETRY["提示重试"]
+  RETRY --> TURN
+  PARSE -->|成功| RPT{"重复调用?"}
+  RPT -->|连续2次| STUCK["中止: 打转"]
+  RPT -->|否| ACT{"action"}
+  ACT -->|final_answer| DONE["返回 markdown"]
+  ACT -->|"web_search\nweb_fetch\nfs_*/shell_run"| TOOL["执行工具\n→ tool_result"]
+  TOOL --> TURN
+
+  style INIT fill:#f3e5f5,stroke:#7b1fa2
+  style DONE fill:#e8f5e9,stroke:#4a7c59
+  style ABORT fill:#ffcdd2,stroke:#c62828
+  style STUCK fill:#ffcdd2,stroke:#c62828
+  </pre>
+</div>
+
+<div class="section">
+  <h2>5. 安全与风控</h2>
+  <pre class="mermaid">
+flowchart LR
+  REQ["Agent 请求工具"] --> RISK["risk::filter_tools()"]
+  RISK --> LOW["Low 模式\n✓ search/fetch/read/list\n✗ write/shell/download"]
+  RISK --> MED["Med 模式\n+ write/download\n✗ shell"]
+  RISK --> HIGH["High 模式\n全部允许"]
+  LOW --> GATE
+  MED --> GATE
+  HIGH --> GATE
+  GATE["search_key 检查\n→ 沙箱隔离\n→ timeout\n→ 重复检测\n→ redact 脱敏"]
+
+  style REQ fill:#fff3e0,stroke:#e65100
+  style GATE fill:#e0f2f1,stroke:#00695c
+  </pre>
+</div>
+
+<div class="section">
+  <h2>6. 数据存储</h2>
+  <pre class="mermaid">
+flowchart LR
+  subgraph FE["前端 localStorage"]
+    A["feedback\n哇哇评分"]
+    B["report_layout\n报告配置"]
+    C["profile\n用户资料"]
+  end
+  subgraph BE["后端 SQLite"]
+    D["todos 表\nraw/plan/agent_output"]
+    E["settings KV\nllm/persona/agent_config"]
+  end
+  subgraph FS["文件系统"]
+    F["~/sath/agents/\nAgent 库"]
+    G["~/sath/workspace/\n沙箱"]
+    H["Obsidian vault"]
+  end
+
+  D <-->|Tauri IPC| FE
+  E --> PLAN["Planner"]
+  D --> PLAN
+  D --> H
+
+  style FE fill:#fff8e1,stroke:#f9a825
+  style BE fill:#e3f2fd,stroke:#1565c0
+  style FS fill:#e8f5e9,stroke:#4a7c59
+  </pre>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      fontFamily: '-apple-system, "PingFang SC", sans-serif',
+      fontSize: '12px',
+      primaryColor: '#e8f5e9',
+      primaryTextColor: '#1a1a2e',
+      lineColor: '#aaa',
+    },
+    flowchart: { curve: 'basis', padding: 12, nodeSpacing: 24, rankSpacing: 32 }
+  });
+</script>
+</body>
+</html>

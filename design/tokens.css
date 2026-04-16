@@ -1,0 +1,61 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   瓦时 LIST — Design Tokens
+   Dieter Rams 极简风格 · 纸质感 · 深色侧边栏
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── Palette ─────────────────────────────────────────────────────────────
+     原则：以 cream 为主，dark 为强调，accent(orange) 极少使用
+  */
+  --cream:        #EDEDE5;   /* 主背景 — 纸张色           */
+  --cream-dim:    #E4E4DC;   /* 浅一档表面（卡片背景）    */
+  --cream-inset:  #DEDED6;   /* 内嵌区域（输入框、选中）  */
+  --gray:         #C8C7C3;   /* 边框 / 静默文字           */
+  --gray-mid:     rgba(200, 199, 195, 0.6);
+  --gray-faint:   rgba(200, 199, 195, 0.35);
+  --dark:         #272926;   /* 侧边栏 / 强调文字 / 主按钮 */
+  --dark-mid:     #3A3B38;   /* 次级深色                  */
+  --accent:       #E88B46;   /* 橙色 — 极少使用（提示/今日）*/
+  --accent-dim:   rgba(232, 139, 70, 0.12);
+  --accent-mid:   rgba(232, 139, 70, 0.35);
+
+  /* ── Semantic aliases ────────────────────────────────────────────────── */
+  --bg:           var(--cream);
+  --surface:      var(--cream-dim);
+  --border:       var(--gray);
+  --border-faint: var(--gray-faint);
+  --text:         var(--dark);
+  --text-muted:   #5A5A56;   /* 正文辅助色 */
+  --text-faint:   #9A9994;   /* 时间戳 / 标签 */
+
+  /* ── Card paper color (SpaceCanvas 展开卡片) ─────────────────────────── */
+  --card-paper:   #D8D7CF;   /* 比 cream-inset 更深，完全不透明 */
+
+  /* ── Typography ──────────────────────────────────────────────────────── */
+  font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.5;
+
+  /* ── Spacing scale ───────────────────────────────────────────────────── */
+  /* 4 / 6 / 8 / 10 / 12 / 16 / 20 / 24 / 28 / 32 px */
+
+  /* ── Border radius ───────────────────────────────────────────────────── */
+  /* 2px = 小按钮/badge   3px = 输入框/卡片   6px = 弹窗   10px = 展开卡片 */
+
+  /* ── Shadows ─────────────────────────────────────────────────────────── */
+  --shadow-card:
+    0 1px 0 rgba(255,255,255,0.85) inset,
+    0 3px 10px rgba(39,41,38,0.12),
+    0 1px 3px rgba(39,41,38,0.07);
+  --shadow-modal:
+    0 0 0 1px rgba(39,41,38,0.18),
+    0 0 0 4px var(--cream),
+    0 0 0 5px rgba(39,41,38,0.12),
+    0 20px 60px rgba(39,41,38,0.28),
+    0 4px 12px rgba(39,41,38,0.15);
+
+  /* ── Z-index layers ──────────────────────────────────────────────────── */
+  /* 100 = 展开卡片   150 = hover卡片   200 = 弹窗遮罩 */
+}

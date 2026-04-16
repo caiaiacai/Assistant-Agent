@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>SATH · 系统架构</title>
+<style>
+  /* Dieter Rams: Less, but better. */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #fafaf8;
+    color: #1a1a1a;
+    font-family: -apple-system, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+    min-height: 100vh;
+    padding: 60px 24px 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Typography — Braun TP1 clarity */
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    color: #0a0a0a;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: #888;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    margin-bottom: 56px;
+  }
+
+  /* Container */
+  .flow {
+    max-width: 880px;
+    margin: 0 auto;
+  }
+
+  /* Section labels — minimal, uppercase */
+  .section { margin-bottom: 32px; }
+  .section-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: #999;
+    margin-bottom: 12px;
+    padding-left: 2px;
+    font-weight: 500;
+  }
+
+  /* Nodes — Rams' functional honesty */
+  .row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .node {
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    min-width: 100px;
+    transition: transform 0.15s ease;
+    line-height: 1.4;
+  }
+  .node:hover { transform: translateY(-1px); }
+  .node small {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    opacity: 0.6;
+    margin-top: 3px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Color system — restrained, functional */
+  .sensor   { background: #f0f4f8; border: 1px solid #d0d8e0; color: #3a5a7c; }
+  .brain    { background: #f5f0ff; border: 1px solid #d8d0f0; color: #5b3e9e; }
+  .executor { background: #f0faf5; border: 1px solid #c8e8d8; color: #2d6a4f; }
+  .output   { background: #fdf8f0; border: 1px solid #e8dcc8; color: #8b6914; }
+  .sync     { background: #fff5f5; border: 1px solid #f0d8d8; color: #9b3a3a; }
+  .storage  { background: #f8f8f8; border: 1px solid #e0e0e0; color: #555; }
+
+  /* Arrows — pure, geometric */
+  .arrow {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0;
+  }
+  .arrow::before {
+    content: "";
+    width: 1px;
+    height: 24px;
+    background: #ccc;
+  }
+  .arrow-label {
+    font-size: 10px;
+    color: #999;
+    text-align: center;
+    padding: 2px 0;
+    letter-spacing: 0.3px;
+  }
+
+  /* Dual columns */
+  .dual {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+  .dual-box {
+    flex: 1;
+    max-width: 420px;
+    padding: 20px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #eee;
+  }
+  .dual-box h3 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  .dual-box ul {
+    list-style: none;
+    font-size: 12px;
+    line-height: 2;
+    color: #666;
+  }
+  .dual-box ul li::before {
+    content: "·";
+    margin-right: 8px;
+    color: #bbb;
+  }
+
+  /* Pipeline flow — horizontal */
+  .pipeline {
+    display: flex;
+    gap: 0;
+    justify-content: center;
+    align-items: stretch;
+    margin: 8px 0;
+  }
+  .pipe-step {
+    flex: 1;
+    max-width: 180px;
+    padding: 16px 14px;
+    text-align: center;
+    border: 1px solid #e8e8e8;
+    background: #fff;
+    font-size: 12px;
+    line-height: 1.6;
+    position: relative;
+  }
+  .pipe-step:first-child { border-radius: 8px 0 0 8px; }
+  .pipe-step:last-child { border-radius: 0 8px 8px 0; }
+  .pipe-step + .pipe-step { border-left: none; }
+  .pipe-step .step-num {
+    font-size: 10px;
+    color: #bbb;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .pipe-step .step-title {
+    font-weight: 600;
+    color: #333;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .pipe-step .step-desc { color: #888; font-size: 11px; }
+  .pipe-step.active { background: #fafaf8; }
+
+  /* Data schema preview */
+  .schema-preview {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 11px;
+    line-height: 1.8;
+    color: #555;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+  .schema-preview .table-name { color: #5b3e9e; font-weight: 600; }
+  .schema-preview .field { color: #333; }
+  .schema-preview .type { color: #888; }
+  .schema-preview .comment { color: #bbb; }
+
+  /* Tech badges */
+  .tech-row { text-align: center; margin-top: 40px; }
+  .tech-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    background: #f5f5f5;
+    border: 1px solid #e8e8e8;
+    color: #777;
+    margin: 2px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Tagline */
+  .tagline {
+    text-align: center;
+    margin-top: 48px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    letter-spacing: 1px;
+  }
+  .tagline-sub {
+    text-align: center;
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Separator */
+  .sep {
+    height: 1px;
+    background: #eee;
+    margin: 40px auto;
+    max-width: 200px;
+  }
+
+  /* Principle cards */
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .principle {
+    padding: 16px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+  }
+  .principle .p-num {
+    font-size: 10px;
+    color: #bbb;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .principle .p-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  .principle .p-desc {
+    font-size: 11px;
+    color: #888;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<h1>SATH</h1>
+<p class="subtitle">感知型智能待办中枢 · System Architecture</p>
+
+<div class="flow">
+
+  <!-- ====== Design Principles ====== -->
+  <div class="section">
+    <div class="section-label">Design Principles</div>
+    <div class="principles">
+      <div class="principle">
+        <div class="p-num">01</div>
+        <div class="p-title">影子模式</div>
+        <div class="p-desc">一切 Agent 后台运行，绝不抢焦点、不弹窗、不打断</div>
+      </div>
+      <div class="principle">
+        <div class="p-num">02</div>
+        <div class="p-title">秒级创建</div>
+        <div class="p-desc">TODO 立即可见，智能增强异步回填，不阻塞用户流</div>
+      </div>
+      <div class="principle">
+        <div class="p-num">03</div>
+        <div class="p-title">隐私本地</div>
+        <div class="p-desc">行为轨迹本地处理，仅脱敏摘要送 LLM，数据不出设备</div>
+      </div>
+      <div class="principle">
+        <div class="p-num">04</div>
+        <div class="p-title">乐观锁</div>
+        <div class="p-desc">Agent 回填不覆盖用户修改，version 冲突自动 merge</div>
+      </div>
+      <div class="principle">
+        <div class="p-num">05</div>
+        <div class="p-title">读写隔离</div>
+        <div class="p-desc">调研类并发执行，写操作串行，来自 CC 源码的设计</div>
+      </div>
+      <div class="principle">
+        <div class="p-num">06</div>
+        <div class="p-title">极简界面</div>
+        <div class="p-desc">列表 + 单行输入，没有聊天框，Dieter Rams 风格</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- ====== Main Pipeline ====== -->
+  <div class="section">
+    <div class="section-label">Core Pipeline</div>
+    <div class="pipeline">
+      <div class="pipe-step active">
+        <div class="step-num">01</div>
+        <div class="step-title">感知</div>
+        <div class="step-desc">ActivityWatch<br>窗口 · URL · 焦点文本</div>
+      </div>
+      <div class="pipe-step">
+        <div class="step-num">02</div>
+        <div class="step-title">输入</div>
+        <div class="step-desc">快捷键 · 微信<br>飞书 · API</div>
+      </div>
+      <div class="pipe-step">
+        <div class="step-num">03</div>
+        <div class="step-title">合成</div>
+        <div class="step-desc">输入 × 环境 × 身份<br>三维判定</div>
+      </div>
+      <div class="pipe-step">
+        <div class="step-num">04</div>
+        <div class="step-title">创建</div>
+        <div class="step-desc">秒级 TODO<br>用户立即可见</div>
+      </div>
+      <div class="pipe-step">
+        <div class="step-num">05</div>
+        <div class="step-title">增强</div>
+        <div class="step-desc">后台 Agent<br>异步回填结果</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- ====== Module A: Sensor ====== -->
+  <div class="section">
+    <div class="section-label">Module A · Sensor 感知器</div>
+    <div class="row">
+      <div class="node sensor">ActivityWatch<small>REST API · 窗口事件</small></div>
+      <div class="node sensor">Accessibility<small>聚焦元素文本</small></div>
+      <div class="node sensor">Browser<small>URL + 页面标题</small></div>
+      <div class="node sensor">Git<small>分支 · 最近 commit</small></div>
+    </div>
+    <div class="arrow-label">↓ 清洗 · 脱敏 · 5 分钟窗口聚合</div>
+    <div class="arrow"></div>
+    <div class="row">
+      <div class="node storage">ContextSummary<small>自然语言环境摘要 · SQLite</small></div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- ====== Module B: Brain ====== -->
+  <div class="section">
+    <div class="section-label">Module B · Brain 中枢大脑</div>
+    <div class="dual">
+      <div class="dual-box">
+        <h3>输入网关</h3>
+        <ul>
+          <li>全局快捷键弹窗 (Tauri)</li>
+          <li>微信 Webhook (消息 → 碎片)</li>
+          <li>飞书 Webhook</li>
+          <li>REST API (三方接入)</li>
+        </ul>
+      </div>
+      <div class="dual-box">
+        <h3>三维判定引擎</h3>
+        <ul>
+          <li>输入内容 (用户意图)</li>
+          <li>动态环境 (ContextSummary)</li>
+          <li>静态身份 (Persona 画像)</li>
+          <li>→ LLM 输出结构化 TODO JSON</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- ====== Data Schema ====== -->
+  <div class="section">
+    <div class="section-label">Smart TODO Object · Data Schema</div>
+    <div class="schema-preview">
+      <span class="table-name">todo</span><br>
+      ├─ <span class="field">id</span> <span class="type">TEXT PK</span> <span class="comment">// hex(randomblob(8))</span><br>
+      ├─ <span class="field">title</span> <span class="type">TEXT</span> <span class="comment">// 任务标题 ≤30字</span><br>
+      ├─ <span class="field">body</span> <span class="type">TEXT</span> <span class="comment">// Markdown 富文本</span><br>
+      ├─ <span class="field">status</span> <span class="type">ENUM</span> <span class="comment">// inbox → active → waiting → done → archived</span><br>
+      ├─ <span class="field">intent</span> <span class="type">ENUM</span> <span class="comment">// research | task | record | reminder</span><br>
+      ├─ <span class="field">priority</span> <span class="type">INT 0-4</span> <span class="comment">// 0=none → 4=urgent</span><br>
+      ├─ <span class="field">confidence</span> <span class="type">REAL</span> <span class="comment">// AI 判定置信度</span><br>
+      ├─ <span class="field">context_snapshot</span> <span class="type">JSON</span> <span class="comment">// 创建时环境快照 (冻结)</span><br>
+      ├─ <span class="field">enrichment</span> <span class="type">JSON</span> <span class="comment">// Agent 异步回填的增强内容</span><br>
+      ├─ <span class="field">enrichment_status</span> <span class="type">ENUM</span> <span class="comment">// none → pending → running → done</span><br>
+      ├─ <span class="field">sync_state</span> <span class="type">JSON</span> <span class="comment">// {apple: {}, lark: {}, notion: {}}</span><br>
+      ├─ <span class="field">source_tag</span> <span class="type">TEXT</span> <span class="comment">// 防循环标记</span><br>
+      ├─ <span class="field">version</span> <span class="type">INT</span> <span class="comment">// 乐观锁</span><br>
+      └─ <span class="field">project_id</span> <span class="type">FK</span> <span class="comment">// → project.id</span>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- ====== Module C: Executor ====== -->
+  <div class="section">
+    <div class="section-label">Module C · Executor 执行器</div>
+    <div class="row">
+      <div class="node executor">Research Agent<small>搜索 + LLM 报告 · 并发</small></div>
+      <div class="node executor">Summarize Agent<small>内容摘要 · 并发</small></div>
+      <div class="node executor">Remind Agent<small>定时提醒 · 串行</small></div>
+      <div class="node executor">Execute Agent<small>执行动作 · 串行</small></div>
+    </div>
+    <div class="arrow-label">↓ 乐观锁 merge · 不覆盖用户修改</div>
+    <div class="arrow"></div>
+    <div class="row">
+      <div class="node storage">agent_task<small>SQLite 持久化队列 · 优先级调度 · 自动重试</small></div>
+    </div>
+  </div>
+
+  <div class="arrow"></div>
+
+  <!-- ====== Module D: Sync ====== -->
+  <div class="section">
+    <div class="section-label">Module D · Distributor 分发器</div>
+    <div class="row">
+      <div class="node sync">Apple Reminders<small>EventKit</small></div>
+      <div class="node sync">飞书待办<small>Open API</small></div>
+      <div class="node sync">Notion<small>Database API</small></div>
+    </div>
+    <div class="arrow-label">双向同步 · source_tag 防循环 · sync_log 审计</div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- ====== Borrowed from CC & Hermes ====== -->
+  <div class="section">
+    <div class="section-label">Architecture Inspirations</div>
+    <div class="dual">
+      <div class="dual-box">
+        <h3>← Claude Code 源码</h3>
+        <ul>
+          <li>AsyncLocalStorage 隔离并发 Agent</li>
+          <li>读写分离: 只读并发, 写操作串行</li>
+          <li>分层 Context: System + User + Tool</li>
+          <li>Hook 系统: Pre/Post Tool 生命周期</li>
+          <li>乐观锁 + version 冲突检测</li>
+          <li>MessageQueue 优先级调度</li>
+        </ul>
+      </div>
+      <div class="dual-box">
+        <h3>← Hermes Agent</h3>
+        <ul>
+          <li>Skill 注册表: Agent 按类型注册</li>
+          <li>持久化记忆: 跨会话状态</li>
+          <li>Subagent 隔离: 并行工作流</li>
+          <li>Gateway 抽象: 多平台统一入口</li>
+          <li>Cron 调度: 定时任务内置</li>
+          <li>RPC 工具调用协议</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== Tagline ====== -->
+  <div class="tagline">Less, but better.</div>
+  <p class="tagline-sub">丢进来就行，剩下的交给 SATH</p>
+
+  <!-- ====== Tech Stack ====== -->
+  <div class="tech-row">
+    <span class="tech-badge">Tauri 2.0</span>
+    <span class="tech-badge">Rust</span>
+    <span class="tech-badge">React + TypeScript</span>
+    <span class="tech-badge">Python (Sensor)</span>
+    <span class="tech-badge">SQLite + WAL</span>
+    <span class="tech-badge">FTS5</span>
+    <span class="tech-badge">ActivityWatch</span>
+    <span class="tech-badge">Anthropic API</span>
+    <span class="tech-badge">macOS Accessibility</span>
+    <span class="tech-badge">ThreadPoolExecutor</span>
+  </div>
+
+</div>
+
+</body>
+</html>
