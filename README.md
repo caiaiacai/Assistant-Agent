@@ -34,6 +34,31 @@
 
 ---
 
+## 界面截图
+
+### 任务管理
+
+| 日历视图 | 表态矩阵 |
+|:---:|:---:|
+| ![日历视图](docs/images/ui-calendar.jpg) | ![表态矩阵](docs/images/ui-feedback.jpg) |
+| 按日期/分类/标签浏览任务，支持多维过滤 | 拖拽评分（有效 × 准确），反馈直接进入蒸馏 |
+
+### AI 执行与设置
+
+| AI 分析 Pipeline | 知识库接入 |
+|:---:|:---:|
+| ![AI Pipeline](docs/images/ui-pipeline.jpg) | ![知识库](docs/images/ui-knowledge.jpg) |
+| 输入「工具传播？媒介？」→ 自动拆解步骤并联网研究 | 支持 Notion / Obsidian / 语雀 / 本地文件 |
+
+### 核心：用户画像蒸馏
+
+| Agent 权限控制 | L9 蒸馏输出 · 用户认知 |
+|:---:|:---:|
+| ![权限设置](docs/images/ui-permissions.jpg) | ![用户认知](docs/images/ui-user-model.jpg) |
+| 三档权限，保守 → 均衡 → 激进，按需开放 | **系统自动提炼的用户画像**：输入习惯、工作节奏、领域偏好、决策风格，每日凌晨 3 点冷蒸馏更新 |
+
+---
+
 ## 九层架构详解
 
 ![架构图](docs/architecture.svg)
