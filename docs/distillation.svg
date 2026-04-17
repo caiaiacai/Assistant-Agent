@@ -1,0 +1,221 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 740" width="920" height="740" font-family="'PingFang SC','Helvetica Neue',Arial,sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="hotGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff6b35"/>
+      <stop offset="100%" style="stop-color:#ff9f1c"/>
+    </linearGradient>
+    <linearGradient id="coldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4f8ef7"/>
+      <stop offset="100%" style="stop-color:#7b5ea7"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#4f8ef7" opacity="0.8"/>
+    </marker>
+    <marker id="arrOrange" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#ff6b35" opacity="0.8"/>
+    </marker>
+    <marker id="arrGreen" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#22c55e" opacity="0.8"/>
+    </marker>
+    <marker id="arrPurple" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#a78bfa" opacity="0.8"/>
+    </marker>
+  </defs>
+
+  <rect width="920" height="740" fill="url(#bg)" rx="16"/>
+
+  <!-- Title -->
+  <text x="460" y="36" text-anchor="middle" font-size="18" font-weight="700" fill="#fff">L9 · 蒸馏层 · 完整流程</text>
+  <text x="460" y="55" text-anchor="middle" font-size="11" fill="#666">从反馈信号到用户画像更新的完整链路</text>
+
+  <!-- ════════════ INPUT: FEEDBACK ════════════ -->
+  <!-- Feedback from user -->
+  <rect x="30" y="76" width="200" height="88" rx="10" fill="#1a1520" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="130" y="98" text-anchor="middle" font-size="12" fill="#f59e0b" font-weight="700">用户反馈信号（L8）</text>
+  <!-- 4 quadrants -->
+  <rect x="42" y="108" width="82" height="22" rx="4" fill="#1f1800"/>
+  <text x="83" y="123" text-anchor="middle" font-size="10" fill="#f59e0b">有效 × 准确</text>
+  <rect x="132" y="108" width="86" height="22" rx="4" fill="#1f1800"/>
+  <text x="175" y="123" text-anchor="middle" font-size="10" fill="#f59e0b">有效 × 不准确</text>
+  <rect x="42" y="134" width="82" height="22" rx="4" fill="#1a1a1a"/>
+  <text x="83" y="149" text-anchor="middle" font-size="10" fill="#888">无效 × 准确</text>
+  <rect x="132" y="134" width="86" height="22" rx="4" fill="#1a1a1a"/>
+  <text x="175" y="149" text-anchor="middle" font-size="10" fill="#888">无效 × 不准确</text>
+
+  <!-- Regret button -->
+  <rect x="30" y="174" width="200" height="26" rx="6" fill="#1a1015" stroke="#ef4444" stroke-width="1"/>
+  <text x="130" y="191" text-anchor="middle" font-size="11" fill="#ef4444">⟲ 后悔药 · 窗口期内撤销</text>
+
+  <!-- Arrow feedback → hot distill -->
+  <line x1="230" y1="120" x2="272" y2="120" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrOrange)"/>
+
+  <!-- ════════════ HOT DISTILLATION ════════════ -->
+  <rect x="272" y="76" width="250" height="210" rx="12" fill="#1a120a" stroke="#ff6b35" stroke-width="2" filter="url(#glow)"/>
+  <rect x="272" y="76" width="250" height="6" rx="3" fill="url(#hotGrad)"/>
+  <text x="397" y="102" text-anchor="middle" font-size="13" fill="#ff9f1c" font-weight="700">🔥 热蒸馏</text>
+  <text x="397" y="118" text-anchor="middle" font-size="10" fill="#888">每次交互后实时运行</text>
+
+  <!-- Step 1 -->
+  <rect x="286" y="128" width="222" height="36" rx="6" fill="#1f1508"/>
+  <text x="310" y="143" font-size="10" fill="#ff9f1c" font-weight="600">① 写入行为日志</text>
+  <text x="310" y="157" font-size="10" fill="#666">意图类型 / 置信度 / 执行结果 / 反馈状态</text>
+
+  <!-- Step 2 -->
+  <rect x="286" y="170" width="222" height="36" rx="6" fill="#1f1508"/>
+  <text x="310" y="185" font-size="10" fill="#ff9f1c" font-weight="600">② 更新关系网络</text>
+  <text x="310" y="199" font-size="10" fill="#666">人物提及频次 / 亲密度权重 / 场景关联</text>
+
+  <!-- Step 3 -->
+  <rect x="286" y="212" width="222" height="36" rx="6" fill="#1f1508"/>
+  <text x="310" y="227" font-size="10" fill="#ff9f1c" font-weight="600">③ 候选固化判断</text>
+  <text x="310" y="241" font-size="10" fill="#666">高频成功路径 → 写入技能库候选队列</text>
+
+  <!-- Feedback routing -->
+  <rect x="286" y="254" width="222" height="26" rx="6" fill="#150a05"/>
+  <text x="397" y="271" text-anchor="middle" font-size="10" fill="#888">置信权重即时修正 → 下次意图识别更准</text>
+
+  <!-- ════════════ COLD DISTILLATION ════════════ -->
+  <rect x="272" y="304" width="250" height="230" rx="12" fill="#0a0a1f" stroke="#4f8ef7" stroke-width="2" filter="url(#glow)"/>
+  <rect x="272" y="304" width="250" height="6" rx="3" fill="url(#coldGrad)"/>
+  <text x="397" y="330" text-anchor="middle" font-size="13" fill="#7bb3f7" font-weight="700">❄️ 冷蒸馏</text>
+  <text x="397" y="347" text-anchor="middle" font-size="10" fill="#888">每日凌晨 3:00 自动运行</text>
+
+  <!-- Step 1 -->
+  <rect x="286" y="356" width="222" height="36" rx="6" fill="#0d0d22"/>
+  <text x="310" y="371" font-size="10" fill="#7bb3f7" font-weight="600">① 意图频率汇总</text>
+  <text x="310" y="385" font-size="10" fill="#666">统计近7天高频意图 / 识别新规律</text>
+
+  <!-- Step 2 -->
+  <rect x="286" y="398" width="222" height="36" rx="6" fill="#0d0d22"/>
+  <text x="310" y="413" font-size="10" fill="#7bb3f7" font-weight="600">② 画像层级升降档</text>
+  <text x="310" y="427" font-size="10" fill="#666">长期验证 → 固化层 ｜ 长期未触发 → 归档层</text>
+
+  <!-- Step 3 -->
+  <rect x="286" y="440" width="222" height="36" rx="6" fill="#0d0d22"/>
+  <text x="310" y="455" font-size="10" fill="#7bb3f7" font-weight="600">③ LLM 深度蒸馏（可选）</text>
+  <text x="310" y="469" font-size="10" fill="#666">生成自然语言画像摘要 / 输出可读描述</text>
+
+  <!-- Step 4 -->
+  <rect x="286" y="482" width="222" height="46" rx="6" fill="#0d0d22"/>
+  <text x="310" y="497" font-size="10" fill="#7bb3f7" font-weight="600">④ 错误案例归档</text>
+  <text x="310" y="511" font-size="10" fill="#666">低置信 + 无效反馈 → error_cases</text>
+  <text x="310" y="523" font-size="10" fill="#555">待下一轮冷蒸馏重新学习</text>
+
+  <!-- Arrow hot → cold -->
+  <line x1="397" y1="286" x2="397" y2="304" stroke="#555" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+  <text x="410" y="298" font-size="9" fill="#555">异步触发</text>
+
+  <!-- ════════════ USER MODEL ════════════ -->
+  <rect x="590" y="76" width="300" height="360" rx="12" fill="#140d22" stroke="#7b5ea7" stroke-width="2"/>
+  <rect x="590" y="76" width="300" height="6" rx="3" fill="url(#coldGrad)"/>
+  <text x="740" y="102" text-anchor="middle" font-size="13" fill="#a78bfa" font-weight="700">用户画像（L4）</text>
+  <text x="740" y="119" text-anchor="middle" font-size="10" fill="#666">蒸馏结果的存储目标</text>
+
+  <!-- Fixed Layer -->
+  <rect x="604" y="128" width="272" height="86" rx="8" fill="#1a1030"/>
+  <text x="620" y="147" font-size="11" fill="#a78bfa" font-weight="700">固化层</text>
+  <text x="870" y="147" text-anchor="end" font-size="10" fill="#666">长期验证的稳定偏好</text>
+  <rect x="614" y="154" width="252" height="18" rx="4" fill="#12081f"/>
+  <text x="624" y="166" font-size="10" fill="#888">research类任务要给出数据来源和结论</text>
+  <rect x="614" y="176" width="252" height="18" rx="4" fill="#12081f"/>
+  <text x="624" y="188" font-size="10" fill="#888">竞品分析需对比我方产品路线图</text>
+  <rect x="614" y="198" width="120" height="12" rx="3" fill="#0d0618"/>
+  <text x="620" y="208" font-size="9" fill="#555">+ 更多固化规则…</text>
+
+  <!-- Active Layer -->
+  <rect x="604" y="224" width="272" height="96" rx="8" fill="#101828"/>
+  <text x="620" y="243" font-size="11" fill="#4f8ef7" font-weight="700">活跃层</text>
+  <text x="870" y="243" text-anchor="end" font-size="10" fill="#666">近期高频 · 实时更新</text>
+  <rect x="614" y="250" width="252" height="18" rx="4" fill="#0a1020"/>
+  <text x="624" y="262" font-size="10" fill="#888">工作节奏：晨间深度 / 下午低频 / 晚间浏览</text>
+  <rect x="614" y="272" width="252" height="18" rx="4" fill="#0a1020"/>
+  <text x="624" y="284" font-size="10" fill="#888">当前事件群：五一溯溪（9个关联任务）</text>
+  <rect x="614" y="294" width="252" height="18" rx="4" fill="#0a1020"/>
+  <text x="624" y="306" font-size="10" fill="#888">关系网络：陈总(A轮) / 王律师(融资) / 张总</text>
+
+  <!-- Archive Layer -->
+  <rect x="604" y="330" width="272" height="56" rx="8" fill="#111111"/>
+  <text x="620" y="349" font-size="11" fill="#444" font-weight="700">归档层</text>
+  <text x="870" y="349" text-anchor="end" font-size="10" fill="#3a3a3a">失效旧偏好 · 冷蒸馏降档</text>
+  <rect x="614" y="356" width="252" height="18" rx="4" fill="#0d0d0d"/>
+  <text x="624" y="368" font-size="10" fill="#3a3a3a">超过30天未触发的偏好规则…</text>
+
+  <!-- Skills Library update -->
+  <rect x="604" y="396" width="272" height="36" rx="8" fill="#0d1a0d" stroke="#22c55e" stroke-width="1"/>
+  <text x="620" y="412" font-size="11" fill="#22c55e" font-weight="600">→ 技能库（L5）更新</text>
+  <text x="620" y="426" font-size="10" fill="#555">高频成功路径固化为可复用模板</text>
+
+  <!-- Arrow hot → user model -->
+  <line x1="522" y1="160" x2="590" y2="200" stroke="#ff6b35" stroke-width="1.5" marker-end="url(#arrOrange)"/>
+  <text x="535" y="175" font-size="9" fill="#ff6b35">实时写入</text>
+
+  <!-- Arrow cold → user model -->
+  <line x1="522" y1="430" x2="590" y2="360" stroke="#4f8ef7" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="530" y="410" font-size="9" fill="#4f8ef7">批量更新</text>
+
+  <!-- Arrow cold → skills lib -->
+  <line x1="522" y1="470" x2="604" y2="410" stroke="#22c55e" stroke-width="1.5" marker-end="url(#arrGreen)"/>
+
+  <!-- ════════════ OUTPUT ════════════ -->
+  <rect x="590" y="456" width="300" height="74" rx="10" fill="#0d1a0d" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="740" y="476" text-anchor="middle" font-size="12" fill="#22c55e" font-weight="700">蒸馏输出 → 注入 L3 意图层</text>
+  <text x="740" y="492" text-anchor="middle" font-size="10" fill="#666">下次输入时，用户画像随提示词一起注入 LLM</text>
+  <text x="740" y="508" text-anchor="middle" font-size="10" fill="#666">同一句话，产生更准确、更个性化的执行方案</text>
+  <text x="740" y="522" text-anchor="middle" font-size="11" fill="#22c55e">→ 闭环完成，系统越用越懂你</text>
+
+  <!-- Arrow user model → output -->
+  <line x1="740" y1="436" x2="740" y2="456" stroke="#22c55e" stroke-width="1.5" marker-end="url(#arrGreen)"/>
+
+  <!-- ════════════ BOTTOM: TIMELINE ════════════ -->
+  <rect x="30" y="560" width="860" height="148" rx="12" fill="#111118" stroke="#2a2a40" stroke-width="1"/>
+  <text x="460" y="584" text-anchor="middle" font-size="12" fill="#888" font-weight="600">蒸馏节律</text>
+
+  <!-- Timeline line -->
+  <line x1="60" y1="630" x2="860" y2="630" stroke="#2a2a40" stroke-width="2"/>
+
+  <!-- Interaction points -->
+  <circle cx="120" cy="630" r="5" fill="#ff6b35"/>
+  <text x="120" y="618" text-anchor="middle" font-size="9" fill="#ff6b35">交互</text>
+  <text x="120" y="648" text-anchor="middle" font-size="9" fill="#666">热蒸馏</text>
+
+  <circle cx="220" cy="630" r="5" fill="#ff6b35"/>
+  <text x="220" y="618" text-anchor="middle" font-size="9" fill="#ff6b35">交互</text>
+  <text x="220" y="648" text-anchor="middle" font-size="9" fill="#666">热蒸馏</text>
+
+  <circle cx="340" cy="630" r="5" fill="#ff6b35"/>
+  <text x="340" y="618" text-anchor="middle" font-size="9" fill="#ff6b35">交互</text>
+  <text x="340" y="648" text-anchor="middle" font-size="9" fill="#666">热蒸馏</text>
+
+  <!-- Cold distill point -->
+  <line x1="500" y1="600" x2="500" y2="658" stroke="#4f8ef7" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <circle cx="500" cy="630" r="8" fill="#0a0a1f" stroke="#4f8ef7" stroke-width="2"/>
+  <text x="500" y="618" text-anchor="middle" font-size="9" fill="#4f8ef7">凌晨 3:00</text>
+  <text x="500" y="648" text-anchor="middle" font-size="9" fill="#4f8ef7">冷蒸馏</text>
+  <text x="500" y="660" text-anchor="middle" font-size="9" fill="#555">画像层级整理</text>
+
+  <circle cx="600" cy="630" r="5" fill="#ff6b35"/>
+  <text x="600" y="618" text-anchor="middle" font-size="9" fill="#ff6b35">交互</text>
+  <text x="600" y="648" text-anchor="middle" font-size="9" fill="#666">热蒸馏</text>
+
+  <circle cx="700" cy="630" r="5" fill="#ff6b35"/>
+  <text x="700" y="618" text-anchor="middle" font-size="9" fill="#ff6b35">交互</text>
+  <text x="700" y="648" text-anchor="middle" font-size="9" fill="#666">热蒸馏</text>
+
+  <!-- Next cold distill -->
+  <line x1="860" y1="600" x2="860" y2="658" stroke="#4f8ef7" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <circle cx="860" cy="630" r="8" fill="#0a0a1f" stroke="#4f8ef7" stroke-width="2"/>
+  <text x="860" y="618" text-anchor="middle" font-size="9" fill="#4f8ef7">次日 3:00</text>
+  <text x="860" y="648" text-anchor="middle" font-size="9" fill="#4f8ef7">冷蒸馏</text>
+
+  <!-- Labels -->
+  <text x="60" y="700" font-size="10" fill="#555">■ <tspan fill="#ff6b35">热蒸馏</tspan>  每次交互后立即执行，毫秒级，写入行为日志 + 更新关系网络 + 候选固化</text>
+  <text x="60" y="718" font-size="10" fill="#555">■ <tspan fill="#4f8ef7">冷蒸馏</tspan>  每日凌晨3点批处理，汇总规律 + 升降档 + 可选LLM深度摘要</text>
+</svg>
