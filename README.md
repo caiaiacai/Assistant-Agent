@@ -281,6 +281,11 @@ python bridge.py
 
 ---
 
-## License
+## ⚖️ 开源协议
+本项目采用 MIT License 开源。
 
-MIT © 2025 caiaiacai
+## 🌟 贡献建议
+如果你对 意图识别算法、画像蒸馏模型 或 垂直领域 Agent 感兴趣，欢迎提交 Issue 或 Pull Request。让我们一起消灭那个烦人的“确认对话框”。
+
+## 📌 Topics
+ai-agent llm autonomous-agents productivity personal-ai knowledge-distillation automation intent-recognition cognitive-architecture
