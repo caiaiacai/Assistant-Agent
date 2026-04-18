@@ -33,8 +33,6 @@
 - 第1天：「记得买猫粮（待办）」— 品牌渠道全不知道  
 - 第45天：「Royal Canin 成猫粮 4kg，京东 ¥168，已创建待办」— 直接执行
 
-[→ 查看完整五组对比](docs/demo.html)
-
 ---
 
 ## 🖥️ 界面预览
@@ -62,31 +60,31 @@ pip install -r requirements.txt
 python bridge.py
 
 ### 3. 配置使用
--启动服务后，打开本地 index.html 进入桌面 UI。
--在 设置 → 连接 填写你的模型 API 及搜索引擎 Key (Tavily/Brave)。
--在 设置 → Agent 选择权限档位（建议从“保守”开始体验）。
+1. 启动服务后，打开本地 `index.html` 进入桌面 UI。
+2. 在 **设置 → 连接** 填写你的模型 API 及搜索引擎 Key (Tavily/Brave)。
+3. 在 **设置 → Agent** 选择权限档位（建议从“保守”开始体验）。
 
 ---
 
 ## 项目结构
-
-```
+```text
 ├── bridge.py                  # 核心服务：HTTP Bridge + LLM调用 + DB读写 + v2组件初始化
 ├── index.html                 # 桌面 UI
-├── sath-source/
-│   ├── brain/
+├── sath-source/               # 核心源代码目录
+│   ├── brain/                 # 逻辑大脑模块
 │   │   ├── pipeline.py        # L2缓冲池 + L3意图 + L4用户模型 + L5技能库
 │   │   ├── orchestrator.py    # L6编排层：OrchestratorAgent + 权限路由 + 心跳
 │   │   └── distillation.py    # L9蒸馏层：热蒸馏 + 冷蒸馏 + 反馈矩阵
-│   ├── executor/              # L7执行层：各工具实现
-│   ├── prompts/
-│   │   └── intent_classifier.py  # L3提示词：用户模型注入 + 输出格式
-│   ├── sensor/                # L1输入层：微信/桌面消息接收
-│   └── schema/                # 数据库 Schema（自动建表）
+│   ├── executor/              # L7执行层：各工具（搜索/文件/Shell）具体实现
+│   ├── prompts/               # 提示词管理
+│   │   └── intent_classifier.py  # L3提示词：用户模型注入 + 输出格式定义
+│   ├── sensor/                # L1输入层：微信/桌面消息接收与格式化
+│   └── schema/                # 数据库 Schema：自动建表与数据持久化
 ├── agents/                    # 196个垂直领域子Agent（均遵守编排协议）
 ├── skills/                    # 技能定义（L5技能库数据源）
-└── sath-server/               # Rust HTTP服务（可选，替换Python HTTP提升性能）
-```
+└── sath-server/               # Rust HTTP服务（可选，替换Python以提升性能）
+
+ ```
 
 ---
 
@@ -130,7 +128,7 @@ python bridge.py
   │  L9  蒸馏层  │  更新用户画像（热蒸馏 + 冷蒸馏）
   └─────────────┘
 ```
-
+![蒸馏流程图](docs/distillation.svg)
 ---
 
 ### L1 · 输入层
@@ -260,10 +258,6 @@ python bridge.py
 - 汇总意图频率，发现新的行为规律
 - 升降档固化模式（长期验证 → 固化层 / 长期未触发 → 归档层）
 - 可选 LLM 深度蒸馏（生成自然语言画像摘要）
-
-**不存历史记录，存蒸馏后的画像**——每次调用带进去的是精炼的用户理解，而不是原始对话流水账。
-
-![蒸馏流程图](docs/distillation.svg)
 
 ---
 
