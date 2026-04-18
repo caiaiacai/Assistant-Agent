@@ -302,7 +302,6 @@ python bridge.py
 
 支持两种方式，可同时并存：
 
-- **iLink Bot**：扫码登录，webhook 指向 `/webhook/ilink`
 - **ClawBot**（微信官方灰测）：webhook 指向 `/webhook/wechat`
 
 ---
