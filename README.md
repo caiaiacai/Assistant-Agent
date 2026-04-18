@@ -37,28 +37,56 @@
 
 ---
 
-## 界面截图
+## 🖥️ 界面预览
 
-### 任务管理
-
-| 日历视图 | 表态矩阵 |
-|:---:|:---:|
+| 📅 任务管理 (日历视图) | 📊 反馈矩阵 (用户复盘) |
+| :---: | :---: |
 | ![日历视图](docs/images/ui-calendar.jpg) | ![表态矩阵](docs/images/ui-feedback.jpg) |
-| 按日期/分类/标签浏览任务，支持多维过滤 | 拖拽评分（有效 × 准确），反馈直接进入蒸馏 |
+| **智能 Pipeline 拆解** | **L9 画像输出预览** |
+| ![AI Pipeline](docs/images/ui-pipeline.jpg) | ![用户认知](docs/images/ui-user-model.jpg) |
 
-### AI 执行与设置
+---
 
-| AI 分析 Pipeline | 知识库接入 |
-|:---:|:---:|
-| ![AI Pipeline](docs/images/ui-pipeline.jpg) | ![知识库](docs/images/ui-knowledge.jpg) |
-| 输入「工具传播？媒介？」→ 自动拆解步骤并联网研究 | 支持 Notion / Obsidian / 语雀 / 本地文件 |
+## 🚀 快速开始
 
-### 核心：用户画像蒸馏
+### 1. 依赖环境
+- **系统**: macOS 12+ (推荐) / Linux
+- **语言**: Python 3.10+
+- **密钥**: OpenAI API Key (或 DeepSeek / 月之暗面等兼容接口)
 
-| Agent 权限控制 | L9 蒸馏输出 · 用户认知 |
-|:---:|:---:|
-| ![权限设置](docs/images/ui-permissions.jpg) | ![用户认知](docs/images/ui-user-model.jpg) |
-| 三档权限，保守 → 均衡 → 激进，按需开放 | **系统自动提炼的用户画像**：输入习惯、工作节奏、领域偏好、决策风格，每日凌晨 3 点冷蒸馏更新 |
+### 2. 安装步骤
+```bash
+git clone [https://github.com/caiaiacai/Assistant-Agent.git](https://github.com/caiaiacai/Assistant-Agent.git)
+cd Assistant-Agent
+pip install -r requirements.txt
+python bridge.py
+
+### 3. 配置使用
+-启动服务后，打开本地 index.html 进入桌面 UI。
+-在 设置 → 连接 填写你的模型 API 及搜索引擎 Key (Tavily/Brave)。
+-在 设置 → Agent 选择权限档位（建议从“保守”开始体验）。
+
+---
+
+## 项目结构
+
+```
+├── bridge.py                  # 核心服务：HTTP Bridge + LLM调用 + DB读写 + v2组件初始化
+├── index.html                 # 桌面 UI
+├── sath-source/
+│   ├── brain/
+│   │   ├── pipeline.py        # L2缓冲池 + L3意图 + L4用户模型 + L5技能库
+│   │   ├── orchestrator.py    # L6编排层：OrchestratorAgent + 权限路由 + 心跳
+│   │   └── distillation.py    # L9蒸馏层：热蒸馏 + 冷蒸馏 + 反馈矩阵
+│   ├── executor/              # L7执行层：各工具实现
+│   ├── prompts/
+│   │   └── intent_classifier.py  # L3提示词：用户模型注入 + 输出格式
+│   ├── sensor/                # L1输入层：微信/桌面消息接收
+│   └── schema/                # 数据库 Schema（自动建表）
+├── agents/                    # 196个垂直领域子Agent（均遵守编排协议）
+├── skills/                    # 技能定义（L5技能库数据源）
+└── sath-server/               # Rust HTTP服务（可选，替换Python HTTP提升性能）
+```
 
 ---
 
@@ -248,57 +276,6 @@
 全链路只有两个节点调用 LLM：**L3 意图识别** 和 **L9 蒸馏**。其余七层全部是规则引擎或本地计算。
 
 平均每条任务 LLM 调用 < 2 次，使用 GPT-4o-mini 约 $0.001/条。
-
----
-
-## 快速开始
-
-### 依赖
-
-- macOS 12+
-- Python 3.10+
-- OpenAI API Key（或兼容接口，如 DeepSeek / 月之暗面）
-
-### 安装
-
-```bash
-git clone https://github.com/caiaiacai/Assistant-Agent.git
-cd Assistant-Agent
-pip install -r requirements.txt
-python bridge.py
-```
-
-打开 `index.html` 即可使用桌面 UI。
-
-### 配置
-
-在 UI **设置 → 连接** 填写：
-- **LLM**：Model / Base URL / API Key
-- **搜索引擎**：选择 Tavily 或 Brave，填入 API Key（Tavily 免费额度足够个人使用）
-
-在 **设置 → Agent** 选择权限档位（建议从保守开始）。
-
----
-
-## 项目结构
-
-```
-├── bridge.py                  # 核心服务：HTTP Bridge + LLM调用 + DB读写 + v2组件初始化
-├── index.html                 # 桌面 UI
-├── sath-source/
-│   ├── brain/
-│   │   ├── pipeline.py        # L2缓冲池 + L3意图 + L4用户模型 + L5技能库
-│   │   ├── orchestrator.py    # L6编排层：OrchestratorAgent + 权限路由 + 心跳
-│   │   └── distillation.py    # L9蒸馏层：热蒸馏 + 冷蒸馏 + 反馈矩阵
-│   ├── executor/              # L7执行层：各工具实现
-│   ├── prompts/
-│   │   └── intent_classifier.py  # L3提示词：用户模型注入 + 输出格式
-│   ├── sensor/                # L1输入层：微信/桌面消息接收
-│   └── schema/                # 数据库 Schema（自动建表）
-├── agents/                    # 196个垂直领域子Agent（均遵守编排协议）
-├── skills/                    # 技能定义（L5技能库数据源）
-└── sath-server/               # Rust HTTP服务（可选，替换Python HTTP提升性能）
-```
 
 ---
 
